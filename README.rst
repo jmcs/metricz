@@ -30,6 +30,7 @@ To write a metric with a custom timestamp:
 
     import datetime
 
+    # Make sure this is in UTC.
     timestamp = datetime.datetime(1981, 10, 26, 6, 24)
 
     mw.write_metric('some.metric.name', 34, {'some': 'tag'}, timestamp)

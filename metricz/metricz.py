@@ -39,7 +39,7 @@ class MetricWriter(object):
         :return: None
         :rtype: None
         """
-        now = datetime.datetime.now()
+        now = datetime.datetime.utcnow()
         if not self.token_ts or (now - TOKEN_RENEWAL_PERIOD) > self.token_ts:
             token = tokens.get('uid')
             self.token_ts = now
@@ -57,7 +57,8 @@ class MetricWriter(object):
         :type value: int
         :param tags: Tags to add to the metric.
         :type tags: dict
-        :param timestamp: The time to register the metric. (Default: now)
+        :param timestamp: The time (IN UTC!) to register the metric. (Default:
+                          now)
         :type timestamp: datetime.datetime
         :return: None
         :rtype: None
@@ -120,7 +121,7 @@ class MetricWriter(object):
         :return: A payload dictionary.
         :rtype: dict
         """
-        ts = timestamp if timestamp else datetime.datetime.now()
+        ts = timestamp if timestamp else datetime.datetime.utcnow()
         payload = {
             'name': metric_name,
             'timestamp': self._datetime_to_millis(ts),
