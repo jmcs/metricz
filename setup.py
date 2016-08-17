@@ -25,7 +25,7 @@ setup(
     long_description=readme + '\n\n' + history,
     author="Daniël Franke",
     author_email='daniel.franke@zalando.de',
-    url='https://github.com/ainmosni/metricz',
+    url='https://github.com/bus/metricz',
     packages=[
         'metricz',
     ],
