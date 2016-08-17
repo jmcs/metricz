@@ -11,11 +11,14 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     'requests',
-    'stups-tokens'
+    'stups-tokens',
+    'click',
+    'clickclick',
+    'environmental>=1.0',
 ]
 
 test_requirements = [
-    # TODO: put package test requirements here
+    'pytest'
 ]
 
 setup(
@@ -47,6 +50,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
-    test_suite='tests',
-    tests_require=test_requirements
+    setup_requires=['pytest-runner'],
+    tests_require=test_requirements,
+    entry_points={'console_scripts': ['metricz = metricz.cli:main']}
 )
