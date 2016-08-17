@@ -26,4 +26,3 @@ class TestMetricz(object):
     @classmethod
     def teardown_class(cls):
         pass
-
