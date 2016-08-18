@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import click
+import socket
 import requests
 from clickclick import AliasedGroup, fatal_error
 from environmental import Str
@@ -43,6 +44,9 @@ def write(metric_name: str, value: int, tags: dict):
         config.credentials_dir,
         fail_silently=False
     )
+
+    # default tag the hostname
+    tags['hostname'] = socket.gethostname()
     try:
         metric_writer.write_metric(metric_name, value, tags)
     except requests.ConnectionError as e:
