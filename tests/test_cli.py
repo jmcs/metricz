@@ -88,13 +88,9 @@ def test_invalid_tags_usage(runner):
     assert result.exit_code == 2
 
 
-def test_missing_token_url():
-    env_missing_token_url = {
-        'CREDENTIALS_DIR': '/meta/credentials',
-        'METRICZ_DB_URL': 'kairosdb.example.com'
-    }
+def test_missing_configs_uses_defaults():
+    env_missing_envs = {}
     return CliRunner()
     result = runner.invoke(main, ['write', 'thing', '1'],
-                           env=env_missing_token_url, catch_exceptions=False)
-    assert 'Environment variable OAUTH2_ACCESS_TOKEN_URL is not set.' in result.output
-    assert result.exit_code == 1
+                           env=env_missing_envs, catch_exceptions=False)
+    assert result.exit_code == 0

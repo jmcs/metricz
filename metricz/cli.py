@@ -6,14 +6,14 @@ import socket
 import requests
 from clickclick import AliasedGroup, fatal_error
 from environmental import Str
-from metricz import MetricWriter
+from metricz import MetricWriter, OAUTH2_ACCESS_TOKEN_URL, CREDENTIALS_DIR
 
 main = AliasedGroup(context_settings=dict(help_option_names=['-h', '--help']))
 
 
 class Configuration:
-    token_url = Str('OAUTH2_ACCESS_TOKEN_URL')
-    credentials_dir = Str('CREDENTIALS_DIR', '/meta/credentials')
+    token_url = Str('OAUTH2_ACCESS_TOKEN_URL', OAUTH2_ACCESS_TOKEN_URL)
+    credentials_dir = Str('CREDENTIALS_DIR', CREDENTIALS_DIR)
 
 
 def parse_tags(ctx, param, value):
@@ -34,17 +34,11 @@ def parse_tags(ctx, param, value):
 @click.argument('tags', nargs=-1, callback=parse_tags)
 def write(metric_name: str, value: int, tags: dict):
     config = Configuration()
-    try:
-        token_url = config.token_url
-    except AttributeError:
-        fatal_error('Environment variable OAUTH2_ACCESS_TOKEN_URL is not set.')
-
     metric_writer = MetricWriter(
-        token_url,
+        config.token_url,
         config.credentials_dir,
         fail_silently=False
     )
-
     # default tag the hostname
     tags['hostname'] = socket.gethostname()
     try:
