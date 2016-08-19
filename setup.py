@@ -23,7 +23,7 @@ test_requirements = [
 
 setup(
     name='metricz',
-    version='0.1.1',
+    version='0.1.2',
     description="Metricz makes it easy to write your metrics to the Bus kairosdb instance.",
     long_description=readme + '\n\n' + history,
     author="Daniël Franke",
