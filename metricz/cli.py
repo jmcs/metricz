@@ -48,4 +48,4 @@ def write(metric_name: str, value: int, tags: dict):
         _, pretty_reason = str(reason).split(':', 1)
         fatal_error(pretty_reason)
     except requests.HTTPError as e:
-        fatal_error('HTTP {}'.format(e.response.status_code))
+        fatal_error('HTTP {0} {1}'.format(e.response.status_code, e.response.text))
