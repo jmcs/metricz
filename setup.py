@@ -24,11 +24,11 @@ test_requirements = [
 setup(
     name='metricz',
     version='0.1.2',
-    description="Metricz makes it easy to write your metrics to the Bus kairosdb instance.",
+    description="Metricz makes it easy to write metrics to a Kairosdb instance running with OAuth2 security.",
     long_description=readme + '\n\n' + history,
     author="Daniël Franke",
     author_email='daniel.franke@zalando.de',
-    url='https://github.com/bus/metricz',
+    url='https://github.com/zalando-incubator/metricz',
     packages=[
         'metricz',
     ],
