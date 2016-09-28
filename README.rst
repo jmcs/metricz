@@ -2,7 +2,7 @@
 Metricz
 ===============================
 
-Metricz makes it easy to write your metrics to the Bus kairosdb instance.
+Metricz makes it easy to write metrics to a Kairosdb instance running with OAuth2 security.
 
 
 Features
