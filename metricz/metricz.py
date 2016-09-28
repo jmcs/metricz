@@ -2,15 +2,16 @@
 
 import datetime
 import json
+import os
 
 import requests
 import tokens
 
 CREDENTIALS_DIR = '/meta/credentials'
-OAUTH2_ACCESS_TOKEN_URL = 'https://token.services.auth.zalando.com/oauth2/access_token?realm=/services'
+OAUTH2_ACCESS_TOKEN_URL = 'https://token.auth.example.com'
 TOKEN_RENEWAL_PERIOD = datetime.timedelta(hours=1)
 
-KAIROSDB_URL = 'https://kairosdb.bus.zalan.do/api/v1/datapoints'
+KAIROSDB_URL = 'https://kairosdb.example.com'
 
 EPOCH = datetime.datetime.utcfromtimestamp(0)
 
@@ -20,8 +21,9 @@ class MetricWriter(object):
     Interface class to write metrics to the Bus kairosdb.
     """
     def __init__(self,
-                 url=OAUTH2_ACCESS_TOKEN_URL,
-                 directory=CREDENTIALS_DIR,
+                 url=os.environ.get('OAUTH2_ACCESS_TOKEN_URL', OAUTH2_ACCESS_TOKEN_URL),
+                 directory=os.environ.get('CREDENTIALS_DIR', CREDENTIALS_DIR),
+                 kairosdb_url=os.environ.get('KAIROSDB_URL', KAIROSDB_URL),
                  fail_silently=True):
         tokens.configure(url=url, dir=directory)
         tokens.manage('uid', ['uid'])
@@ -31,6 +33,7 @@ class MetricWriter(object):
         self.requests = requests.session()
         self._renew_token()
         self.deferred_metrics = []
+        self.kairosdb_url = kairosdb_url
 
     def _renew_token(self):
         """
@@ -64,7 +67,7 @@ class MetricWriter(object):
         :rtype: None
         """
         payload = self._construct_payload(metric_name, value, tags, timestamp)
-        response = self.requests.post(KAIROSDB_URL, data=json.dumps(payload))
+        response = self.requests.post(self.kairosdb_url, data=json.dumps(payload))
 
         if not self.fail_silently:
             response.raise_for_status()
@@ -96,7 +99,7 @@ class MetricWriter(object):
         """
         if self.deferred_metrics:
             response = self.requests.post(
-                KAIROSDB_URL,
+                self.kairosdb_url,
                 data=json.dumps(self.deferred_metrics)
             )
 
