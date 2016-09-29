@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import socket
-from unittest.mock import MagicMock
+from mock import MagicMock
 
 import pytest
 from click.testing import CliRunner
