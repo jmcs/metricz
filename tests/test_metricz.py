@@ -5,7 +5,7 @@ from metricz import MetricWriter
 from metricz.metricz import KAIROSDB_URL
 
 import datetime
-from unittest.mock import MagicMock, ANY
+from mock import MagicMock, ANY
 import pytest
 
 
