@@ -1,28 +1,60 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-test_metricz
-----------------------------------
+from metricz import MetricWriter
+from metricz.metricz import KAIROSDB_URL
 
-Tests for `metricz` module.
-"""
-
+import datetime
+from unittest.mock import MagicMock, ANY
 import pytest
 
 
-from metricz import metricz
+@pytest.fixture(autouse=True)
+def mock_token(monkeypatch):
+    mocked_tokens_gen = MagicMock(name='Token Gen')
+    mocked_tokens_gen.get = MagicMock(return_value='ABCabc')
+    monkeypatch.setattr('metricz.metricz.tokens', mocked_tokens_gen)
+    return mocked_tokens_gen
 
 
-class TestMetricz(object):
+@pytest.fixture(autouse=True)
+def freeze_datetime(monkeypatch):
+    current_time = datetime.datetime(2016, 9, 29, 0, 0)
+    mocked_datetime = MagicMock()
+    mocked_datetime.utcnow = MagicMock(return_value=current_time)
+    monkeypatch.setattr('metricz.metricz.datetime', mocked_datetime)
+    return mocked_datetime
 
-    @classmethod
-    def setup_class(cls):
-        pass
 
-    def test_something(self):
-        pass
+@pytest.fixture
+def requests_mock(monkeypatch):
+    mocked_requests = MagicMock(name='mocked requests')
+    mocked_requests.session = MagicMock(return_value=mocked_requests)
+    monkeypatch.setattr('metricz.metricz.requests', mocked_requests)
+    return mocked_requests
 
-    @classmethod
-    def teardown_class(cls):
-        pass
+
+def test_write_with_timeout(requests_mock):
+    # use the default one
+    metric_writer = MetricWriter()
+    metric_writer.write_metric('foobar', 1, {"foo": "bar"})
+    requests_mock.post.assert_called_with(
+        KAIROSDB_URL,
+        data=ANY,
+        timeout=4)
+
+    # use the timeout in the call
+    metric_writer = MetricWriter()
+    metric_writer.write_metric('foobar', 1, {"foo": "bar"}, timeout=10)
+    requests_mock.post.assert_called_with(
+        KAIROSDB_URL,
+        data=ANY,
+        timeout=10)
+
+    # use the timeout in the MetricWriter class
+    metric_writer = MetricWriter(timeout=5)
+    metric_writer.write_metric('foobar', 1, {"foo": "bar"})
+    requests_mock.post.assert_called_with(
+        KAIROSDB_URL,
+        data=ANY,
+        timeout=5)

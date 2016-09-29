@@ -24,13 +24,15 @@ class MetricWriter(object):
                  url=os.environ.get('OAUTH2_ACCESS_TOKEN_URL', OAUTH2_ACCESS_TOKEN_URL),
                  directory=os.environ.get('CREDENTIALS_DIR', CREDENTIALS_DIR),
                  kairosdb_url=os.environ.get('KAIROSDB_URL', KAIROSDB_URL),
-                 fail_silently=True):
+                 fail_silently=True,
+                 timeout=4):
         tokens.configure(url=url, dir=directory)
         tokens.manage('uid', ['uid'])
         tokens.start()
         self.token_ts = None
         self.fail_silently = fail_silently
         self.requests = requests.session()
+        self.timeout = timeout
         self._renew_token()
         self.deferred_metrics = []
         self.kairosdb_url = kairosdb_url
@@ -50,7 +52,7 @@ class MetricWriter(object):
                 'Authorization': 'Bearer {}'.format(token)
             })
 
-    def write_metric(self, metric_name, value, tags, timestamp=None):
+    def write_metric(self, metric_name, value, tags, timestamp=None, timeout=None):
         """
         Writes a metric to kairosdb.
 
@@ -67,7 +69,7 @@ class MetricWriter(object):
         :rtype: None
         """
         payload = self._construct_payload(metric_name, value, tags, timestamp)
-        response = self.requests.post(self.kairosdb_url, data=json.dumps(payload))
+        response = self.requests.post(self.kairosdb_url, data=json.dumps(payload), timeout=timeout or self.timeout)
 
         if not self.fail_silently:
             response.raise_for_status()
@@ -90,7 +92,7 @@ class MetricWriter(object):
         payload = self._construct_payload(metric_name, value, tags, timestamp)
         self.deferred_metrics.append(payload)
 
-    def write_deferred(self):
+    def write_deferred(self, timeout=None):
         """
         Writes all deferred metrics to kairosdb.
 
@@ -100,7 +102,8 @@ class MetricWriter(object):
         if self.deferred_metrics:
             response = self.requests.post(
                 self.kairosdb_url,
-                data=json.dumps(self.deferred_metrics)
+                data=json.dumps(self.deferred_metrics),
+                timeout=timeout or self.timeout
             )
 
             if 300 > response.status_code > 199:
@@ -109,7 +112,7 @@ class MetricWriter(object):
             if not self.fail_silently:
                 response.raise_for_status()
 
-    def _construct_payload(self, metric_name, value, tags, timestamp):
+    def _construct_payload(self, metric_name, value, tags, timestamp=None):
         """
         Constructs a metric payload.
 
