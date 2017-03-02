@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 import datetime
 import json
+import pprint
 import os
 
 import requests
@@ -14,6 +17,23 @@ TOKEN_RENEWAL_PERIOD = datetime.timedelta(hours=1)
 KAIROSDB_URL = 'https://kairosdb.example.com'
 
 EPOCH = datetime.datetime.utcfromtimestamp(0)
+
+
+def handle_request_errors(response):
+    """
+    Handles potential errors that were not silenced
+    :type response: requests.Response
+    """
+
+    try:
+        response.raise_for_status()
+    except requests.HTTPError:
+        try:
+            error = pprint.pformat(response.json())
+        except json.JSONDecodeError:
+            error = response.content
+        print("Response: \n", error)
+        raise
 
 
 class MetricWriter(object):
@@ -72,7 +92,7 @@ class MetricWriter(object):
         response = self.requests.post(self.kairosdb_url, data=json.dumps(payload), timeout=timeout or self.timeout)
 
         if not self.fail_silently:
-            response.raise_for_status()
+            handle_request_errors(response)
 
     def defer_metric(self, metric_name, value, tags, timestamp=None):
         """
@@ -110,7 +130,7 @@ class MetricWriter(object):
                 self.deferred_metrics = []
 
             if not self.fail_silently:
-                response.raise_for_status()
+                handle_request_errors(response)
 
     def _construct_payload(self, metric_name, value, tags, timestamp=None):
         """
