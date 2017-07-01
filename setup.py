@@ -27,9 +27,9 @@ setup(
     version='0.1.5',
     description="Metricz makes it easy to write metrics to a Kairosdb instance running with OAuth2 security.",
     long_description=readme + '\n\n' + history,
-    author="Daniël Franke",
-    author_email='daniel.franke@zalando.de',
-    url='https://github.com/zalando-incubator/metricz',
+    author="João Santos",
+    author_email='jmcs@jsantos.eu',
+    url='https://github.com/jmcs/metricz',
     packages=[
         'metricz',
     ],

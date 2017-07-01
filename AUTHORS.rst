@@ -2,12 +2,13 @@
 Credits
 =======
 
-Development Lead
-----------------
+Maintainer
+----------
+* João Santos <jmcs@jsantos.eu>
 
-* Daniël Franke <daniel.franke@zalando.de>
 
 Contributors
 ------------
 
-* Rafael Caricio <rafael.caricio@zalando.de>
+* Daniël Franke
+* Rafael Caricio
