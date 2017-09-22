@@ -44,6 +44,7 @@ class MetricWriter(object):
                  url=os.environ.get('OAUTH2_ACCESS_TOKEN_URL', OAUTH2_ACCESS_TOKEN_URL),
                  directory=os.environ.get('CREDENTIALS_DIR', CREDENTIALS_DIR),
                  kairosdb_url=os.environ.get('KAIROSDB_URL', KAIROSDB_URL),
+                 uid='uid',
                  fail_silently=True,
                  timeout=4):
         tokens.configure(url=url, dir=directory)
@@ -53,20 +54,21 @@ class MetricWriter(object):
         self.fail_silently = fail_silently
         self.requests = requests.session()
         self.timeout = timeout
-        self._renew_token()
+        self._renew_token(uid)
         self.deferred_metrics = []
         self.kairosdb_url = kairosdb_url
 
-    def _renew_token(self):
+    def _renew_token(self, uid):
         """
         Renews the oauth2 token if it's older than the renewal period.
 
+        :param uid: uid to get the token for.
         :return: None
         :rtype: None
         """
         now = datetime.datetime.utcnow()
         if not self.token_ts or (now - TOKEN_RENEWAL_PERIOD) > self.token_ts:
-            token = tokens.get('uid')
+            token = tokens.get(uid)
             self.token_ts = now
             self.requests.headers.update({
                 'Authorization': 'Bearer {}'.format(token)
