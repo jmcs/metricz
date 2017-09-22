@@ -24,7 +24,7 @@ test_requirements = [
 
 setup(
     name='metricz',
-    version='0.1.5.1',
+    version='0.1.5.2',
     description="Metricz makes it easy to write metrics to a Kairosdb instance running with OAuth2 security.",
     long_description=readme + '\n\n' + history,
     author="João Santos",
