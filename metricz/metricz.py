@@ -50,6 +50,7 @@ class MetricWriter(object):
         tokens.configure(url=url, dir=directory)
         tokens.manage('uid', ['uid'])
         tokens.start()
+        self.token_name = token_name
         self.token_ts = None
         self.fail_silently = fail_silently
         self.requests = requests.session()
@@ -90,6 +91,7 @@ class MetricWriter(object):
         :return: None
         :rtype: None
         """
+        self._renew_token(self.token_name)
         payload = self._construct_payload(metric_name, value, tags, timestamp)
         response = self.requests.post(self.kairosdb_url, data=json.dumps(payload), timeout=timeout or self.timeout)
 
@@ -122,6 +124,7 @@ class MetricWriter(object):
         :rtype: None
         """
         if self.deferred_metrics:
+            self._renew_token(self.token_name)
             response = self.requests.post(
                 self.kairosdb_url,
                 data=json.dumps(self.deferred_metrics),
