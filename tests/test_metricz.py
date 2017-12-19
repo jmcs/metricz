@@ -37,14 +37,18 @@ def requests_mock(monkeypatch):
 def test_write_with_timeout(requests_mock):
     # use the default one
     metric_writer = MetricWriter()
+    metric_writer._renew_token = MagicMock()
     metric_writer.write_metric('foobar', 1, {"foo": "bar"})
     requests_mock.post.assert_called_with(
         KAIROSDB_URL,
         data=ANY,
         timeout=4)
+    
 
     # use the timeout in the call
     metric_writer = MetricWriter()
+    metric_writer._renew_token = MagicMock()
+    metric_writer.write_metric('foobar', 1, {"foo": "bar"})
     metric_writer.write_metric('foobar', 1, {"foo": "bar"}, timeout=10)
     requests_mock.post.assert_called_with(
         KAIROSDB_URL,
@@ -53,6 +57,8 @@ def test_write_with_timeout(requests_mock):
 
     # use the timeout in the MetricWriter class
     metric_writer = MetricWriter(timeout=5)
+    metric_writer._renew_token = MagicMock()
+    metric_writer.write_metric('foobar', 1, {"foo": "bar"})
     metric_writer.write_metric('foobar', 1, {"foo": "bar"})
     requests_mock.post.assert_called_with(
         KAIROSDB_URL,
